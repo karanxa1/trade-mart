@@ -1,0 +1,17 @@
+build:
+  python:
+    version: "3.10"
+
+services:
+  - name: trade-mart
+    type: web
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn trade_mart.app:app"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        valueFrom:
+          name: trade-mart-db
+          key: DATABASE_URL
