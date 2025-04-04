@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Trade Mart{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('products') }}">Products</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('products', category=product.category_id) }}">{{ get_category_name(product.category_id) }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Images -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <img src="{{ url_for('static', filename='images/products/' + product.image) }}" alt="{{ product.name }}" class="img-fluid" onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Product Info -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h1 class="mb-3">{{ product.name }}</h1>
+                    <div class="d-flex align-items-center mb-3">
+                        <h3 class="text-primary mb-0">₹{{ "%.2f"|format(product.price) }}</h3>
+                        {% if product.negotiable %}
+                        <span class="badge bg-warning ms-2">Negotiable</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex mb-2">
+                            <div style="width: 120px;"><strong>Condition:</strong></div>
+                            <div>{{ condition.name }}</div>
+                        </div>
+                        <div class="d-flex mb-2">
+                            <div style="width: 120px;"><strong>Category:</strong></div>
+                            <div>{{ get_category_name(product.category_id) }}</div>
+                        </div>
+                        <div class="d-flex mb-2">
+                            <div style="width: 120px;"><strong>Listed:</strong></div>
+                            <div>{{ product.created_at|format_date }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p>{{ product.description }}</p>
+                    </div>
+                    
+                    {% if 'user_id' in session and session.get('user_type') == 'buyer' and session.get('user_id') != product.seller_id %}
+                    <div class="mb-4">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="post">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            {% if product.negotiable %}
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#offerModal">
+                                    <i class="fas fa-comments-dollar me-2"></i> Make Offer
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-2">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#messageModal">
+                                <i class="fas fa-envelope me-2"></i> Message Seller
+                            </button>
+                        </div>
+                    </div>
+                    {% elif not 'user_id' in session %}
+                    <div class="alert alert-info">
+                        <p class="mb-0"><a href="{{ url_for('login') }}">Sign in</a> to buy this item or make an offer.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Seller Info -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Seller Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="seller-info mb-4">
+                        <h5 class="mb-3">Seller Information</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="seller-avatar me-3">
+                                <i class="fas fa-user-circle fa-3x text-secondary"></i>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <h6 class="mb-1 me-2">{{ product.seller.username }}</h6>
+                                    {% if product.seller.is_verified %}
+                                        <span class="badge bg-info" data-bs-toggle="tooltip" title="Email Verified">
+                                            <i class="fas fa-check-circle"></i> Verified
+                                        </span>
+                                    {% endif %}
+                                    {% if product.seller.identity_verified %}
+                                        <span class="badge bg-success ms-1" data-bs-toggle="tooltip" title="ID Verified">
+                                            <i class="fas fa-id-card"></i> ID Verified
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="seller-rating">
+                                    {% if product.seller.total_ratings > 0 %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="stars me-2">
+                                                {% set rating = product.seller.avg_rating|round(1, 'floor') %}
+                                                {% for i in range(5) %}
+                                                    {% if i < rating|int %}
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    {% elif i == rating|int and rating % 1 >= 0.5 %}
+                                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star text-warning"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            <span>{{ "%.1f"|format(product.seller.avg_rating) }} ({{ product.seller.total_ratings }} ratings)</span>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">No ratings yet</span>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">Member since {{ product.seller.created_at }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-2">
+                        <div style="width: 100px;"><strong>Member since:</strong></div>
+                        <div>{{ product.seller.created_at|format_date }}</div>
+                    </div>
+                    
+                    {% if 'user_id' in session and session.get('user_id') != product.seller_id %}
+                    <div class="text-end">
+                        <a href="{{ url_for('products', seller=product.seller_id) }}" class="btn btn-sm btn-outline-secondary">
+                            View All Listings
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Similar Products -->
+    {% if similar_products %}
+    <div class="mt-5">
+        <h3 class="mb-4">Similar Products</h3>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {% for sim_product in similar_products %}
+            <div class="col">
+                <div class="card h-100 shadow-sm product-card">
+                    <div class="product-img-wrapper">
+                        <img src="{{ url_for('static', filename='images/products/' + sim_product.image) }}" class="card-img-top" alt="{{ sim_product.name }}" onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate">{{ sim_product.name }}</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-primary">₹{{ "%.2f"|format(sim_product.price) }}</span>
+                            <a href="{{ url_for('product_detail', product_id=sim_product.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Make Offer Modal -->
+{% if 'user_id' in session and session.get('user_type') == 'buyer' and product.negotiable %}
+<div class="modal fade" id="offerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Make an Offer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('make_offer', product_id=product.id) }}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="current-price" class="form-label">Current Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="text" class="form-control" id="current-price" value="{{ "%.2f"|format(product.price) }}" disabled>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="offer-price" class="form-label">Your Offer</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" class="form-control" id="offer-price" name="offer_price" min="1" max="{{ (product.price - 0.01)|float }}" step="0.01" required>
+                        </div>
+                        <div class="form-text">Make an offer lower than the listing price (₹{{ "%.2f"|format(product.price) }}).</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Offer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Message Modal -->
+{% if 'user_id' in session and session.get('user_id') != product.seller_id %}
+<div class="modal fade" id="messageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Message to Seller</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('send_message') }}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="receiver_id" value="{{ product.seller_id }}">
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <input type="hidden" name="from_product" value="true">
+                    <div class="mb-3">
+                        <label for="message-content" class="form-label">Your Message</label>
+                        <textarea class="form-control" id="message-content" name="content" rows="4" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-img-wrapper {
+        height: 180px;
+        overflow: hidden;
+    }
+    .product-img-wrapper img {
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+    }
+    .product-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %} 

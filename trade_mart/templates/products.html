@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Products - Trade Mart{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('products') }}" method="get">
+                        {% if search_query %}
+                        <input type="hidden" name="search" value="{{ search_query }}">
+                        {% endif %}
+                        
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Categories</h6>
+                            <div class="list-group">
+                                <a href="{{ url_for('products', condition=selected_condition, search=search_query) }}" 
+                                   class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
+                                    All Categories
+                                </a>
+                                {% for category in get_categories() %}
+                                <a href="{{ url_for('products', category=category.id, condition=selected_condition, search=search_query) }}" 
+                                   class="list-group-item list-group-item-action {% if selected_category == category.id %}active{% endif %}">
+                                    {{ category.name }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Condition</h6>
+                            <select name="condition" class="form-select" onchange="this.form.submit()">
+                                <option value="">Any Condition</option>
+                                {% for condition in conditions %}
+                                <option value="{{ condition.id }}" {% if selected_condition == condition.id %}selected{% endif %}>
+                                    {{ condition.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Price Range</h6>
+                            <div class="row g-2">
+                                <div class="col">
+                                    <input type="number" class="form-control" placeholder="Min" min="0">
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control" placeholder="Max" min="0">
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary mt-2">Apply</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Products Grid -->
+        <div class="col-lg-9">
+            <!-- Search Results Info -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    {% if search_query %}
+                    <h4>Search results for: "{{ search_query }}"</h4>
+                    {% elif selected_category %}
+                    <h4>{{ get_category_name(selected_category) }}</h4>
+                    {% else %}
+                    <h4>All Products</h4>
+                    {% endif %}
+                    <p class="text-muted mb-0">{{ products|length }} items found</p>
+                </div>
+                <div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                    <select class="form-select d-inline-block ms-2" style="width: auto;">
+                        <option>Sort by: Featured</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Newest First</option>
+                    </select>
+                </div>
+            </div>
+            
+            {% if products %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for product in products %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm product-card">
+                        <div class="product-img-wrapper">
+                            <img src="{{ url_for('static', filename='images/products/' + product.image) }}" class="card-img-top" alt="{{ product.name }}" onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}';">
+                            {% if product.negotiable %}
+                            <span class="badge bg-warning position-absolute top-0 start-0 m-2">Negotiable</span>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-truncate">{{ product.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="text-primary mb-0">₹{{ "%.2f"|format(product.price) }}</h5>
+                                <div>
+                                    <a href="{{ url_for('product_detail', product_id=product.id) }}" 
+                                        class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    {% if 'user_id' in session and session.get('user_type') == 'buyer' %}
+                                    <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="post" class="d-inline">
+                                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-cart-plus"></i> Add
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                            <div class="seller-info">
+                                <small class="text-muted d-flex align-items-center">
+                                    <i class="fas fa-user-circle me-1"></i> 
+                                    {{ product.seller.username }}
+                                    {% if product.seller.is_verified %}
+                                        <span class="badge bg-info ms-1" data-bs-toggle="tooltip" title="Email Verified">
+                                            <i class="fas fa-check-circle"></i>
+                                        </span>
+                                    {% endif %}
+                                    {% if product.seller.identity_verified %}
+                                        <span class="badge bg-success ms-1" data-bs-toggle="tooltip" title="ID Verified">
+                                            <i class="fas fa-id-card"></i>
+                                        </span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <small class="text-muted">{{ product.created_at|format_date }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Add pagination here if needed -->
+            
+            {% else %}
+            <div class="alert alert-info text-center p-5">
+                <i class="fas fa-search fa-3x mb-3"></i>
+                <h4>No products found</h4>
+                <p>Try adjusting your search or filter criteria</p>
+                <a href="{{ url_for('products') }}" class="btn btn-outline-primary mt-2">Clear all filters</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .product-img-wrapper {
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+    }
+    .product-img-wrapper img {
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+    }
+</style>
+{% endblock %} 

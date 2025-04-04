@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Product - Trade Mart{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Add New Product</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('add_product') }}" enctype="multipart/form-data">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="price" class="form-label">Price (₹) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="price" name="price" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="quantity" class="form-label">Available Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1" required>
+                                <div class="form-text">Enter the number of pieces available for this product</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="category_id" class="form-label">Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="category_id" name="category_id" required>
+                                    <option value="" selected disabled>Select a category</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="condition_id" class="form-label">Condition <span class="text-danger">*</span></label>
+                                <select class="form-select" id="condition_id" name="condition_id" required>
+                                    <option value="" selected disabled>Select condition</option>
+                                    {% for condition in conditions %}
+                                    <option value="{{ condition.id }}">{{ condition.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                            <div class="form-text">Provide detailed information about your product including brand, model, age, features, etc.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="image_file" class="form-label">Product Image</label>
+                            <input type="file" class="form-control" id="image_file" name="image_file" accept="image/*">
+                            <div class="form-text">Upload an image of your product. Supported formats: JPG, PNG, GIF</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="negotiable" name="negotiable" checked>
+                                <label class="form-check-label" for="negotiable">
+                                    Price is negotiable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('seller_dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Add Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Preview image when file is selected
+        const imageInput = document.getElementById('image_file');
+        const previewContainer = document.createElement('div');
+        previewContainer.className = 'mt-2 d-none';
+        previewContainer.innerHTML = '<img id="imagePreview" class="img-thumbnail" style="max-height: 200px" />';
+        imageInput.parentNode.appendChild(previewContainer);
+        
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    previewContainer.classList.remove('d-none');
+                };
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                previewContainer.classList.add('d-none');
+            }
+        });
+        
+        // Validate price is positive
+        const priceInput = document.getElementById('price');
+        priceInput.addEventListener('input', function() {
+            if (parseFloat(this.value) <= 0) {
+                this.setCustomValidity('Price must be greater than zero');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    });
+</script>
+{% endblock %} 

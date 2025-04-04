@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - Trade Mart{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">My Orders</h1>
+    
+    {% if orders %}
+        <div class="row">
+            {% for order in orders %}
+                <div class="col-md-12 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-bold">Order #{{ order.id }}</span>
+                                <span class="ms-3 text-muted">{{ order.order_date|format_date }}</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-{{ 'success' if order.status == 'completed' else 'warning' if order.status == 'pending' else 'danger' }}">
+                                    {{ order.status|title }}
+                                </span>
+                                {% if order.tracking_id %}
+                                <span class="ms-2 badge bg-info">Tracking: {{ order.tracking_id }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Order Tracking Status -->
+                            {% if order.tracking_status %}
+                            <div class="tracking-progress mb-4">
+                                <h6 class="fw-bold">Tracking Status</h6>
+                                <div class="row tracking-steps">
+                                    {% set statuses = ['order_placed', 'processing', 'shipped', 'out_for_delivery', 'delivered'] %}
+                                    {% set status_names = {
+                                        'order_placed': 'Order Placed',
+                                        'processing': 'Processing',
+                                        'shipped': 'Shipped',
+                                        'out_for_delivery': 'Out for Delivery',
+                                        'delivered': 'Delivered'
+                                    } %}
+                                    
+                                    {% set current_index = statuses.index(order.tracking_status) if order.tracking_status in statuses else 0 %}
+                                    
+                                    {% for status in statuses %}
+                                        {% if order.tracking_status != 'cancelled' %}
+                                            {% set step_index = loop.index0 %}
+                                            <div class="col tracking-step text-center">
+                                                <div class="step-icon {{ 'active' if step_index <= current_index else '' }}">
+                                                    {% if step_index < current_index %}
+                                                        <i class="fas fa-check"></i>
+                                                    {% else %}
+                                                        <span>{{ loop.index }}</span>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="step-title mt-2 {{ 'active' if step_index <= current_index else '' }}">
+                                                    {{ status_names[status] }}
+                                                </div>
+                                                {% if not loop.last %}
+                                                    <div class="step-line {{ 'active' if step_index < current_index else '' }}"></div>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+
+                                {% if order.estimated_delivery %}
+                                <div class="mt-2 text-end">
+                                    <small class="text-muted">Estimated Delivery: {{ order.estimated_delivery|format_date }}</small>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {% if order.tracking_status == 'cancelled' %}
+                                <div class="alert alert-danger mb-4">
+                                    <div class="d-flex">
+                                        <div class="me-3">
+                                            <i class="fas fa-times-circle fa-2x"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="alert-heading">Order Cancelled</h6>
+                                            <p class="mb-0">This order has been cancelled and will not be processed further.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Latest Tracking Update -->
+                            {% if order.tracking_updates %}
+                                <div class="latest-update mb-3">
+                                    <h6 class="fw-bold">Latest Update</h6>
+                                    {% set latest_update = order.tracking_updates|sort(attribute='timestamp', reverse=true)|first %}
+                                    <div class="alert alert-light">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="fw-bold">{{ latest_update.status|replace('_', ' ')|title }}</span>
+                                            <small class="text-muted">{{ latest_update.timestamp|string|replace('T', ' ')|truncate(16, true, '') }}</small>
+                                        </div>
+                                        <p class="mb-0">{{ latest_update.description }}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% endif %}
+                            
+                            <div class="mb-3">
+                                <p><strong>Shipping Address:</strong> {{ order.delivery_address }}</p>
+                                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+                                <p><strong>Total Amount:</strong> ₹{{ "%.2f"|format(order.total_amount) }}</p>
+                            </div>
+                            
+                            <h6 class="fw-bold mb-3">Order Items</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in order.items %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ url_for('product_detail', product_id=item.product_id) }}" class="text-decoration-none">
+                                                        {{ item.product_name }}
+                                                    </a>
+                                                </td>
+                                                <td>₹{{ "%.2f"|format(item.price) }}</td>
+                                                <td>{{ item.quantity }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{ 'success' if item.status == 'completed' else 'warning' if item.status == 'pending' else 'danger' }}">
+                                                        {{ item.status|title }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end mt-3">
+                                <a href="{{ url_for('track_my_order', order_id=order.id) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-truck me-1"></i> View Detailed Tracking
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>You haven't placed any orders yet.</p>
+            <a href="{{ url_for('products') }}" class="btn btn-primary mt-2">Start Shopping</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tracking-steps {
+        display: flex;
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .tracking-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+    
+    .step-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        border: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    .step-icon.active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+    }
+    
+    .step-title {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 5px;
+        text-align: center;
+    }
+    
+    .step-title.active {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+    
+    .step-line {
+        height: 2px;
+        background-color: #dee2e6;
+        flex-grow: 1;
+        position: absolute;
+        top: 15px;
+        width: 100%;
+        left: 50%;
+        z-index: 0;
+    }
+    
+    .step-line.active {
+        background-color: #0d6efd;
+    }
+
+    .latest-update {
+        border-left: 3px solid #0d6efd;
+        padding-left: 15px;
+    }
+</style>
+{% endblock %} 

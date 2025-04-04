@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - Trade Mart{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <h1 class="text-center mb-4">About Trade Mart</h1>
+                    
+                    <div class="mb-5">
+                        <h4 class="mb-3">Our Mission</h4>
+                        <p>Trade Mart is dedicated to creating a secure and trustworthy marketplace where buyers and sellers can connect with confidence. Our platform is designed to facilitate safe transactions while providing a seamless trading experience for all users.</p>
+                    </div>
+
+                    <div class="mb-5">
+                        <h4 class="mb-3">Government Approval</h4>
+                        <p>As a government-approved marketplace, we maintain strict standards for user verification and transaction security. Our platform implements robust verification processes to ensure the authenticity of both buyers and sellers.</p>
+                    </div>
+
+                    <div class="mb-5">
+                        <h4 class="mb-3">Why Choose Trade Mart?</h4>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-shield-alt text-primary fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Secure Transactions</h5>
+                                        <p>Every transaction is monitored and protected by our advanced security systems.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-user-check text-primary fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Verified Users</h5>
+                                        <p>All sellers undergo a strict verification process to ensure authenticity.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-hand-holding-usd text-primary fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Fair Pricing</h5>
+                                        <p>Transparent pricing with the option to negotiate on eligible items.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-headset text-primary fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <h5>24/7 Support</h5>
+                                        <p>Our dedicated support team is always ready to assist you.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <a href="{{ url_for('products') }}" class="btn btn-primary btn-lg">Start Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

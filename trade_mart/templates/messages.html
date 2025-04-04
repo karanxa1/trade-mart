@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages - Trade Mart{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">Messages</h1>
+    
+    <div class="row">
+        <!-- Conversation List -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Conversations</h5>
+                </div>
+                <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
+                    {% if conversation_partners %}
+                        {% for partner_id, username in conversation_partners.items() %}
+                            <a href="{{ url_for('messages', partner_id=partner_id) }}" 
+                               class="list-group-item list-group-item-action {% if active_partner and active_partner.id == partner_id %}active{% endif %}">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-user-circle me-2"></i>
+                                        <strong>{{ username }}</strong>
+                                    </div>
+                                    {% set unread_count = get_unread_messages_count(partner_id) %}
+                                    {% if unread_count > 0 %}
+                                    <span class="badge bg-danger rounded-pill">{{ unread_count }}</span>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="list-group-item text-center py-4">
+                            <p class="mb-0 text-muted">No conversations yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Messages Area -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                {% if active_partner %}
+                <div class="card-header bg-light">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-circle fa-2x text-secondary me-2"></i>
+                        <h5 class="mb-0">{{ active_partner.username }}</h5>
+                    </div>
+                </div>
+                
+                <div class="card-body" style="height: 400px; overflow-y: auto;" id="messageContainer">
+                    {% if conversation %}
+                        {% for message in conversation %}
+                            <div class="mb-3 d-flex {% if message.sender_id == session.get('user_id') %}justify-content-end{% endif %}">
+                                <div class="message-bubble {% if message.sender_id == session.get('user_id') %}my-message{% else %}other-message{% endif %}">
+                                    {% if message.product_id %}
+                                        <div class="mb-1">
+                                            <small class="text-muted">Regarding product #{{ message.product_id }}</small>
+                                        </div>
+                                    {% endif %}
+                                    <div>{{ message.content }}</div>
+                                    <div class="message-time">
+                                        <small class="text-muted">{{ message.created_at|format_date }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <p class="text-muted mb-0">Start a conversation with {{ active_partner.username }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer">
+                    <form action="{{ url_for('send_message') }}" method="post" id="messageForm">
+                        <input type="hidden" name="receiver_id" value="{{ active_partner.id }}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="content" placeholder="Type a message..." required>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% else %}
+                <div class="card-body text-center py-5">
+                    <i class="far fa-envelope fa-4x text-muted mb-3"></i>
+                    <h4>Select a conversation</h4>
+                    <p class="text-muted">Choose a conversation from the list to view messages</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .message-bubble {
+        max-width: 80%;
+        padding: 10px 15px;
+        border-radius: 18px;
+        margin-bottom: 5px;
+        word-wrap: break-word;
+    }
+    
+    .my-message {
+        background-color: #dcf8c6;
+        border-top-right-radius: 5px;
+    }
+    
+    .other-message {
+        background-color: #f1f0f0;
+        border-top-left-radius: 5px;
+    }
+    
+    .message-time {
+        font-size: 0.75rem;
+        text-align: right;
+        margin-top: 3px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messageContainer = document.getElementById('messageContainer');
+        if (messageContainer) {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        const messageForm = document.getElementById('messageForm');
+        if (messageForm) {
+            messageForm.addEventListener('submit', function(e) {
+                const messageInput = messageForm.querySelector('input[name="content"]');
+                if (messageInput && !messageInput.value.trim()) {
+                    e.preventDefault();
+                    alert('Please enter a message');
+                    return;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

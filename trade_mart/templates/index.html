@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}Trade Mart - Buy & Sell Second-Hand Items{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-light py-5 mb-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Find Great Deals on Used Items</h1>
+                <p class="lead mb-4">Buy and sell second-hand products directly from other users. From electronics to furniture, find everything you need at affordable prices.</p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('products') }}" class="btn btn-primary btn-lg px-4">Browse Products</a>
+                    {% if not 'user_id' in session %}
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg px-4">Register Now</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block text-center">
+                <div class="logo-container bg-white p-4 rounded-4 shadow-sm d-inline-block">
+                    <img src="{{ url_for('static', filename='images/trademart-logo.jpg') }}" class="img-fluid" style="max-width: 300px;" alt="Trade Mart">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="mb-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Featured Products</h2>
+            <a href="{{ url_for('products') }}" class="btn btn-outline-primary">View All</a>
+        </div>
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {% for product in featured_products %}
+            <div class="col">
+                <div class="card h-100 shadow-sm product-card">
+                    <div class="product-img-wrapper">
+                        <img src="{{ url_for('static', filename='images/products/' + product.image) }}" class="card-img-top" alt="{{ product.name }}" onerror="this.src='{{ url_for('static', filename='images/placeholder.jpg') }}'">
+                        {% if product.negotiable %}
+                        <span class="badge bg-warning position-absolute top-0 start-0 m-2">Negotiable</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-truncate">{{ product.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="text-primary mb-0">₹{{ "%.2f"|format(product.price) }}</h5>
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-outline-primary btn-sm">View</a>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <small class="text-muted">
+                            Condition: {{ get_condition_name(product.condition_id) }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="mb-5 bg-light py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Shop by Category</h2>
+        <div class="row g-4">
+            {% for category in categories %}
+            <div class="col-md-3 col-6">
+                <a href="{{ url_for('products', category=category.id) }}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm text-center category-card">
+                        <div class="card-body py-4">
+                            <i class="fas fa-{{ get_category_icon(category.name) }} fa-3x mb-3 text-primary"></i>
+                            <h5 class="card-title mb-0">{{ category.name }}</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="mb-5">
+    <div class="container">
+        <h2 class="text-center mb-5">How Trade Mart Works</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 text-center p-4">
+                    <div class="card-body">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-3 mb-3">
+                            <i class="fas fa-sign-in-alt fa-2x text-primary"></i>
+                        </div>
+                        <h4>Create an Account</h4>
+                        <p class="text-muted">Sign up as a buyer or seller to start your second-hand trading journey.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 text-center p-4">
+                    <div class="card-body">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-3 mb-3">
+                            <i class="fas fa-search fa-2x text-primary"></i>
+                        </div>
+                        <h4>Find or List Items</h4>
+                        <p class="text-muted">Browse items to buy or list your own products for sale at your preferred price.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 text-center p-4">
+                    <div class="card-body">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-3 mb-3">
+                            <i class="fas fa-handshake fa-2x text-primary"></i>
+                        </div>
+                        <h4>Make Deals</h4>
+                        <p class="text-muted">Negotiate prices, communicate with other users, and complete your transaction.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="bg-light py-5 mb-5">
+    <div class="container">
+        <h2 class="text-center mb-5">What Our Users Say</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body p-4 text-center">
+                                    <i class="fas fa-quote-left fa-2x text-primary mb-3"></i>
+                                    <p class="lead mb-4">"I sold my old laptop within days of listing it! The negotiation feature made it easy to agree on a fair price with the buyer."</p>
+                                    <div class="d-flex justify-content-center">
+                                        <div class="text-center">
+                                            <h5 class="mb-1">David Wilson</h5>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body p-4 text-center">
+                                    <i class="fas fa-quote-left fa-2x text-primary mb-3"></i>
+                                    <p class="lead mb-4">"Found exactly the furniture I needed for my new apartment at half the retail price. Great condition and friendly seller!"</p>
+                                    <div class="d-flex justify-content-center">
+                                        <div class="text-center">
+                                            <h5 class="mb-1">Emily Johnson</h5>
+                                            <div class="text-warning">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star-half-alt"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon bg-primary rounded-circle" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon bg-primary rounded-circle" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="mb-5">
+    <div class="container">
+        <div class="card shadow-sm border-0 bg-primary text-white">
+            <div class="card-body py-5 text-center">
+                <h2 class="mb-3">Ready to Start Trading?</h2>
+                <p class="lead mb-4">Join thousands of users buying and selling second-hand items on Trade Mart today!</p>
+                {% if not 'user_id' in session %}
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{{ url_for('register') }}?user_type=seller" class="btn btn-light btn-lg px-4">Become a Seller</a>
+                    <a href="{{ url_for('register') }}?user_type=buyer" class="btn btn-outline-light btn-lg px-4">Join as Buyer</a>
+                </div>
+                {% else %}
+                <a href="{{ url_for('products') }}" class="btn btn-light btn-lg px-4">Explore Products</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Government Approval Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h2 class="mb-4">Trade Mart – A Government-Approved Marketplace for Safe Buying & Selling</h2>
+                <p class="lead mb-4">Trade Mart is a secure, government-approved online platform where users can buy and sell products with confidence. Whether you're looking to sell pre-owned items, shop for great deals, or connect with genuine buyers and sellers, Trade Mart provides a seamless and trustworthy experience. With strict verification processes and advanced security measures, we ensure a safe and hassle-free marketplace for everyone. Trade smart, trade safe – only on Trade Mart!</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-card, .category-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .product-card:hover, .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .product-img-wrapper {
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+    }
+    .product-img-wrapper img {
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+    }
+    .logo-container {
+        transition: transform 0.3s ease;
+    }
+    .logo-container:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %} 
