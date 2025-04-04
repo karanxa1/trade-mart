@@ -48,5 +48,5 @@ The application uses SQLite for data storage. The database file (`trade_mart.db`
 
 ## Contact
 
-Phone: +91 7276640676
+Phone: +91 9999999999
 Email: support@trademart.com 
