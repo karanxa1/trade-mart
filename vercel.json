@@ -13,6 +13,13 @@
     }
   ],
   "exclude": [
-    "trade_mart/static/**"
+    "trade_mart/static/**",
+    "trade_mart/templates/**",
+    "*.py",
+    "*.md",
+    "*.txt",
+    "*.sqlite",
+    "*.db",
+    "*.log"
   ]
 }
