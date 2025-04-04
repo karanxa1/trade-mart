@@ -20,6 +20,10 @@
     "*.txt",
     "*.sqlite",
     "*.db",
-    "*.log"
+    "*.log",
+    "*.jpg",
+    "*.png",
+    "*.JPG",
+    "*.jpeg"
   ]
 }
