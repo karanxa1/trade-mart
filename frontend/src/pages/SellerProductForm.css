@@ -1,0 +1,96 @@
+/* Seller Product Form Styles */
+.product-form-page {
+  padding: 4rem 0;
+  background: #f8f9fc;
+  min-height: 80vh;
+}
+
+.product-form-page h1 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.product-form {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.product-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.product-form textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.product-form .checkbox-group {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.product-form .checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  margin: 0;
+  font-weight: normal;
+}
+
+.product-form .checkbox-group input {
+  width: auto;
+  cursor: pointer;
+}
+
+.current-image-preview {
+  margin-top: 0.5rem;
+}
+
+.current-image-preview img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.current-image-preview .note {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+
+.form-actions button {
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+}
+
+@media (max-width: 600px) {
+  .product-form {
+    padding: 1.5rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

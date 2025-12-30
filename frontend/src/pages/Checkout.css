@@ -1,0 +1,146 @@
+/* Checkout Page Styles */
+.checkout-page {
+  padding: 4rem 0;
+  background: #f8f9fc;
+  min-height: 80vh;
+}
+
+.checkout-page h1 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.checkout-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.checkout-form-section {
+  flex: 1;
+}
+
+.form-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.form-section h3 {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.payment-option:hover {
+  background: #f8f9fc;
+}
+
+.payment-option input:checked + label {
+  color: #4e73df;
+  font-weight: 600;
+}
+
+.payment-option label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 1;
+  font-size: 1.05rem;
+}
+
+.order-summary-section {
+  width: 350px;
+}
+
+.summary-items {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.summary-item-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.summary-item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-item-info small {
+  color: #888;
+}
+
+.place-order-btn {
+  margin-top: 2rem;
+  padding: 1.2rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .checkout-layout {
+    flex-direction: column-reverse;
+  }
+  
+  .order-summary-section {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}

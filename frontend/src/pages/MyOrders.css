@@ -1,0 +1,125 @@
+/* My Orders Page Styles */
+.orders-page {
+  padding: 4rem 0;
+  background: #f8f9fc;
+  min-height: 80vh;
+}
+
+.orders-page h1 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1rem;
+}
+
+.order-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.order-date {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.order-id {
+  font-weight: 600;
+  color: #333;
+}
+
+.order-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-success { background: #d1fae5; color: #059669; }
+.status-info { background: #e0f2fe; color: #0284c7; }
+.status-warning { background: #fef3c7; color: #d97706; }
+.status-danger { background: #fee2e2; color: #dc2626; }
+.status-secondary { background: #f3f4f6; color: #4b5563; }
+
+.order-items {
+  margin-bottom: 1rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.item-info {
+  display: flex;
+  gap: 1rem;
+}
+
+.item-title {
+  color: #4e73df;
+  text-decoration: none;
+}
+
+.item-qty {
+  color: #666;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.total-label {
+  color: #666;
+}
+
+.total-amount {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem;
+  background: white;
+  border-radius: 12px;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: #e0e0e0;
+  margin-bottom: 1rem;
+}
