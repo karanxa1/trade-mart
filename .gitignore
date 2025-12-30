@@ -36,10 +36,6 @@ ENV/
 instance/
 .webassets-cache
 
-# Firebase
-serviceAccountKey.json
-**/serviceAccountKey.json
-firebase-debug.log
 
 
 # Vercel
