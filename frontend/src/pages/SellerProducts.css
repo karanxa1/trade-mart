@@ -1,7 +1,7 @@
 /* Seller Products CSS */
 .seller-products-page {
   padding: 4rem 0;
-  background: #f8f9fc;
+  background: var(--primary-color);
   min-height: 80vh;
 }
 
@@ -32,7 +32,7 @@
 
 .product-image {
   height: 200px;
-  background: #f1f3f5;
+  background: var(--primary-color);
   position: relative;
 }
 

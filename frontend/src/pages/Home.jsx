@@ -46,16 +46,34 @@ const Home = () => {
         <div className="container">
           <div className="hero-content">
             <div className="hero-text">
-              <h1>Find Great Deals on Used Items</h1>
+              <h1>Find Great Deals on <span className="text-gradient">Used Items</span></h1>
               <p>Buy and sell second-hand products directly from other users. From electronics to furniture, find everything you need at affordable prices.</p>
               <div className="hero-buttons">
                 <Link to="/products" className="btn btn-primary btn-lg">Browse Products</Link>
                 <Link to="/register" className="btn btn-outline btn-lg">Register Now</Link>
               </div>
             </div>
+            {/* Visual Element / Glass Card */}
             <div className="hero-image">
-              <div className="logo-container">
-                <img src="/images/trademart-logo.jpg" alt="Trade Mart" />
+              <div className="hero-glass-card">
+                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
+                    <div className="step-icon" style={{ margin: 0, width: 50, height: 50, fontSize: '1.2rem' }}>
+                      <i className="fas fa-shield-alt"></i>
+                    </div>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: '1.1rem' }}>Secure Trading</h4>
+                      <p style={{ margin: 0, fontSize: '0.9rem', color: '#cbd5e1' }}>Verified Users</p>
+                    </div>
+                 </div>
+                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div className="step-icon" style={{ margin: 0, width: 50, height: 50, fontSize: '1.2rem' }}>
+                      <i className="fas fa-tags"></i>
+                    </div>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: '1.1rem' }}>Best Prices</h4>
+                      <p style={{ margin: 0, fontSize: '0.9rem', color: '#cbd5e1' }}>Direct Deals</p>
+                    </div>
+                 </div>
               </div>
             </div>
           </div>

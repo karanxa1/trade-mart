@@ -3,6 +3,33 @@ from functools import lru_cache
 from firebase_admin import firestore
 from ..config import db
 
+# In-memory cache for categories and conditions (small, static data)
+_categories_cache = None
+_conditions_cache = None
+_cache_timestamp = None
+CACHE_TTL = 300  # 5 minutes
+
+def _get_categories_cached():
+    global _categories_cache, _cache_timestamp
+    import time
+    now = time.time()
+    if _categories_cache is None or _cache_timestamp is None or (now - _cache_timestamp) > CACHE_TTL:
+        docs = db.collection('categories').stream()
+        _categories_cache = {doc.id: {'id': doc.id, **doc.to_dict()} for doc in docs}
+        _cache_timestamp = now
+    return _categories_cache
+
+def _get_conditions_cached():
+    global _conditions_cache, _cache_timestamp
+    import time
+    now = time.time()
+    if _conditions_cache is None or _cache_timestamp is None or (now - _cache_timestamp) > CACHE_TTL:
+        docs = db.collection('conditions').stream()
+        _conditions_cache = {doc.id: {'id': doc.id, **doc.to_dict()} for doc in docs}
+        _cache_timestamp = now
+    return _conditions_cache
+
+
 class CategoryModel:
     COLLECTION = 'categories'
     
@@ -12,30 +39,33 @@ class CategoryModel:
     
     @classmethod
     def get_by_id(cls, doc_id):
-        doc = cls.get_collection().document(str(doc_id)).get()
-        if doc.exists:
-            return {'id': doc.id, **doc.to_dict()}
-        return None
+        cache = _get_categories_cached()
+        return cache.get(str(doc_id))
     
     @classmethod
-    @lru_cache(maxsize=1)
     def get_all(cls):
-        return [{'id': doc.id, **doc.to_dict()} for doc in cls.get_collection().stream()]
+        cache = _get_categories_cached()
+        return list(cache.values())
     
     @classmethod
     def get_by_name(cls, name):
-        docs = cls.get_collection().where('name', '==', name).limit(1).stream()
-        for doc in docs:
-            return {'id': doc.id, **doc.to_dict()}
+        cache = _get_categories_cached()
+        for cat in cache.values():
+            if cat.get('name') == name:
+                return cat
         return None
     
     @classmethod
     def initialize_categories(cls):
+        global _categories_cache
+        _categories_cache = None  # Clear cache
         categories = ['Electronics', 'Books', 'Furniture', 'Tools', 'Vehicles', 'Toys', 'Clothing', 'Home & Garden']
         for i, name in enumerate(categories, 1):
             existing = cls.get_by_name(name)
             if not existing:
                 cls.get_collection().document(str(i)).set({'name': name})
+        _categories_cache = None  # Clear cache again after init
+
 
 class ConditionModel:
     COLLECTION = 'conditions'
@@ -46,30 +76,32 @@ class ConditionModel:
     
     @classmethod
     def get_by_id(cls, doc_id):
-        doc = cls.get_collection().document(str(doc_id)).get()
-        if doc.exists:
-            return {'id': doc.id, **doc.to_dict()}
-        return None
+        cache = _get_conditions_cached()
+        return cache.get(str(doc_id))
     
     @classmethod
-    @lru_cache(maxsize=1)
     def get_all(cls):
-        return [{'id': doc.id, **doc.to_dict()} for doc in cls.get_collection().stream()]
+        cache = _get_conditions_cached()
+        return list(cache.values())
     
     @classmethod
     def get_by_name(cls, name):
-        docs = cls.get_collection().where('name', '==', name).limit(1).stream()
-        for doc in docs:
-            return {'id': doc.id, **doc.to_dict()}
+        cache = _get_conditions_cached()
+        for cond in cache.values():
+            if cond.get('name') == name:
+                return cond
         return None
     
     @classmethod
     def initialize_conditions(cls):
+        global _conditions_cache
+        _conditions_cache = None  # Clear cache
         conditions = ['New', 'Like New', 'Good', 'Fair', 'Poor']
         for i, name in enumerate(conditions, 1):
             existing = cls.get_by_name(name)
             if not existing:
                 cls.get_collection().document(str(i)).set({'name': name})
+        _conditions_cache = None  # Clear cache again after init
 
 class ProductModel:
     COLLECTION = 'products'

@@ -1,5 +1,5 @@
 // Register Page
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/Common/Toast';
@@ -19,9 +19,15 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [googleModalOpen, setGoogleModalOpen] = useState(false);
   
-  const { register, googleLogin } = useAuth();
+  const { register, googleLogin, isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -70,6 +76,14 @@ const Register = () => {
       toast.error('Google registration failed');
     }
   };
+
+  if (authLoading) {
+    return <div className="auth-container"><div className="loading">Loading...</div></div>;
+  }
+
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="auth-container">

@@ -17,8 +17,6 @@ class UserModel:
         doc = cls.get_collection().document(str(doc_id)).get()
         if doc.exists:
             return {'id': doc.id, **doc.to_dict()}
-        if doc.exists:
-            return {'id': doc.id, **doc.to_dict()}
         return None
     
     @classmethod

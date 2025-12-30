@@ -20,6 +20,22 @@ const Navbar = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownOpen && !event.target.closest('.user-dropdown')) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
   const fetchCounts = async () => {
     try {
       if (isBuyer) {
@@ -38,12 +54,17 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
+    setDropdownOpen(false);
     logout();
     navigate('/');
   };
 
+  const handleLinkClick = () => {
+    setDropdownOpen(false);
+  };
+
   return (
-    <nav className="navbar">
+    <nav className="navbar glass-nav">
       <div className="container">
         <Link to="/" className="navbar-brand">
           <span className="brand-text">Trade Mart</span>
@@ -99,15 +120,15 @@ const Navbar = () => {
                   <div className="dropdown-menu">
                     {!isSeller && (
                       <>
-                        <Link to="/my-orders">My Orders</Link>
-                        <Link to="/my-offers">My Offers</Link>
-                        <Link to="/messages">Messages</Link>
+                        <Link to="/my-orders" onClick={handleLinkClick}>My Orders</Link>
+                        <Link to="/my-offers" onClick={handleLinkClick}>My Offers</Link>
+                        <Link to="/messages" onClick={handleLinkClick}>Messages</Link>
                       </>
                     )}
                     {isSeller && (
                       <>
-                        <Link to="/seller/dashboard">Seller Dashboard</Link>
-                        <Link to="/seller/products">My Products</Link>
+                        <Link to="/seller/dashboard" onClick={handleLinkClick}>Seller Dashboard</Link>
+                        <Link to="/seller/products" onClick={handleLinkClick}>My Products</Link>
                       </>
                     )}
                     <hr />

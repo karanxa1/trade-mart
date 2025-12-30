@@ -43,7 +43,7 @@
   font-size: 1.5rem;
 }
 
-.stat-icon.sales { background: #d1fae5; color: #059669; }
+.stat-icon.sales { background: var(--primary-color); color: #059669; }
 .stat-icon.orders { background: #e0f2fe; color: #0284c7; }
 .stat-icon.products { background: #e0e7ff; color: #4f46e5; }
 .stat-icon.offers { background: #fef3c7; color: #d97706; }

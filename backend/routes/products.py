@@ -128,25 +128,26 @@ async def get_products(
 async def get_featured_products(limit: int = 8):
     products = ProductModel.get_available_products(limit=limit)
     
-    featured_products = []
-    
-    # Collect IDs for batch optimization
+    # Batch fetch sellers
     seller_ids = list(set([p.get('seller_id') for p in products if p.get('seller_id')]))
-    condition_ids = list(set([p.get('condition_id') for p in products if p.get('condition_id')]))
-    
     sellers = UserModel.get_by_ids(seller_ids)
     sellers_map = {s['id']: s for s in sellers}
     
-    # ConditionModel likely doesn't have batch fetch yet, but typically valid conditions are cached or few.
-    # For now we focus on sellers which is the main latency source.
+    # Get all conditions at once (cached)
+    conditions = ConditionModel.get_all()
+    cond_map = {c['id']: c for c in conditions}
     
     for product in products:
         seller = sellers_map.get(product.get('seller_id'))
-        condition = ConditionModel.get_by_id(product.get('condition_id')) # Can be optimized later
+        condition = cond_map.get(product.get('condition_id'))
         product['condition_name'] = condition.get('name') if condition else ''
-        featured_products.append(product)
+        product['seller'] = {
+            'id': seller['id'] if seller else None,
+            'username': seller.get('username') if seller else 'Unknown',
+            'avg_rating': seller.get('avg_rating', 0) if seller else 0
+        }
     
-    return featured_products[:limit]
+    return products[:limit]
 
 @router.get("/categories")
 async def get_categories():
@@ -162,14 +163,23 @@ async def get_product(product_id: str):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     
+    # Use cached lookups
     seller = UserModel.get_by_id(product.get('seller_id'))
     condition = ConditionModel.get_by_id(product.get('condition_id'))
     category = CategoryModel.get_by_id(product.get('category_id'))
     
     seller_stats = ReviewModel.get_seller_stats(seller.get('id')) if seller else {'avg_rating': 0, 'count': 0}
     
+    # Get similar products (limit to 5, filter out current)
     similar = ProductModel.get_available_products(category_id=product.get('category_id'), limit=5)
     similar = [p for p in similar if p.get('id') != product_id][:4]
+    
+    # Enrich similar products with condition names (cached)
+    conditions = ConditionModel.get_all()
+    cond_map = {c['id']: c for c in conditions}
+    for p in similar:
+        cond = cond_map.get(p.get('condition_id'))
+        p['condition_name'] = cond.get('name') if cond else ''
     
     return {
         **product,
@@ -263,9 +273,15 @@ async def delete_product(product_id: str):
 async def get_seller_products(seller_id: str):
     products = ProductModel.get_by_seller(seller_id)
     
+    # Get all categories and conditions at once (cached)
+    categories = CategoryModel.get_all()
+    conditions = ConditionModel.get_all()
+    cat_map = {c['id']: c for c in categories}
+    cond_map = {c['id']: c for c in conditions}
+    
     for p in products:
-        category = CategoryModel.get_by_id(p.get('category_id'))
-        condition = ConditionModel.get_by_id(p.get('condition_id'))
+        category = cat_map.get(p.get('category_id'))
+        condition = cond_map.get(p.get('condition_id'))
         p['category_name'] = category.get('name') if category else ''
         p['condition_name'] = condition.get('name') if condition else ''
     
