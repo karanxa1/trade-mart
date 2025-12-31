@@ -27,6 +27,10 @@ env/
 venv/
 ENV/
 
+# Google Cloud Service Account
+backend/serviceAccountKey.json
+serviceAccountKey.json
+
 # Database
 *.db
 *.sqlite3
