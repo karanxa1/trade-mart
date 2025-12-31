@@ -130,14 +130,14 @@
 }
 
 .step.current .step-icon {
-  background: #4e73df;
+  background: var(--primary-color);
   color: white;
   transform: scale(1.1);
   box-shadow: 0 0 0 5px rgba(78, 115, 223, 0.2);
 }
 
 .step.current .step-label {
-  color: #4e73df;
+  color: var(--primary-color);
 }
 
 .order-details-mini {

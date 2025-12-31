@@ -50,7 +50,7 @@ const Footer = () => {
 
         <hr />
         <div className="footer-bottom">
-          <p>© 2024 Trade Mart. All rights reserved.</p>
+          <p>© 2025 Trade Mart. All rights reserved.</p>
         </div>
       </div>
     </footer>

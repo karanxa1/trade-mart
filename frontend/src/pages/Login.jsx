@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../components/Common/Toast';
+import GoogleLogo from '../components/Common/GoogleLogo';
 import './Auth.css';
 
 const Login = () => {
@@ -110,8 +111,8 @@ const Login = () => {
         </div>
 
         <button onClick={handleGoogleLogin} className="btn btn-google btn-block">
-          <img src="/images/google-icon.png" alt="Google" onError={(e) => {e.target.style.display='none'}} /> 
-          <i className="fab fa-google" style={{marginRight: '8px'}}></i> Continue with Google
+          <GoogleLogo />
+          Continue with Google
         </button>
 
         <div className="auth-footer">

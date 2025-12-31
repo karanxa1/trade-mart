@@ -70,7 +70,7 @@
 }
 
 .item-name:hover {
-  color: #4e73df;
+  color: var(--primary-color);
 }
 
 .item-meta {
@@ -199,7 +199,7 @@
 }
 
 .continue-shopping:hover {
-  color: #4e73df;
+  color: var(--primary-color);
 }
 
 .empty-cart {

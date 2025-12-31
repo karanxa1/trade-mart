@@ -84,7 +84,7 @@
 }
 
 .item-title {
-  color: #4e73df;
+  color: var(--primary-color);
   text-decoration: none;
 }
 

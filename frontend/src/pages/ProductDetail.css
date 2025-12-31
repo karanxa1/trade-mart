@@ -81,7 +81,7 @@
 
 .tag.category {
   background: #eef2ff;
-  color: #4e73df;
+  color: var(--primary-color);
 }
 
 .tag.condition {
@@ -99,7 +99,7 @@
 .price-tag {
   font-size: 2.5rem;
   font-weight: 800;
-  color: #4e73df;
+  color: var(--primary-color);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -223,7 +223,7 @@
 }
 
 .btn-link {
-  color: #4e73df;
+  color: var(--primary-color);
   text-decoration: underline;
   background: none;
   text-align: left;

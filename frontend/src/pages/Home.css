@@ -275,7 +275,7 @@
 
 .cta {
   padding: 8rem 0;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  background: var(--gradient-primary);
   color: white;
   position: relative;
   overflow: hidden;

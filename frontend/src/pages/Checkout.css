@@ -83,7 +83,7 @@
 }
 
 .payment-option input:checked + label {
-  color: #4e73df;
+  color: var(--primary-color);
   font-weight: 600;
 }
 
