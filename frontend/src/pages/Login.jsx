@@ -46,10 +46,13 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
+
+  const handleGoogleLogin = async (userType) => {
     try {
       setError('');
-      await googleLogin('buyer');
+      setShowGoogleModal(false);
+      await googleLogin(userType);
       toast.success('Welcome back!');
       navigate('/');
     } catch (err) {
@@ -110,7 +113,7 @@ const Login = () => {
           <span>OR</span>
         </div>
 
-        <button onClick={handleGoogleLogin} className="btn btn-google btn-block">
+        <button onClick={() => setShowGoogleModal(true)} className="btn btn-google btn-block">
           <GoogleLogo />
           Continue with Google
         </button>
@@ -119,6 +122,25 @@ const Login = () => {
           <p>Don't have an account? <Link to="/register">Register here</Link></p>
         </div>
       </div>
+
+      {showGoogleModal && (
+        <div className="modal-overlay" onClick={() => setShowGoogleModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h3>Select Account Type</h3>
+            <div className="modal-actions">
+              <button onClick={() => handleGoogleLogin('buyer')} className="btn btn-primary btn-block">
+                Continue as Buyer
+              </button>
+              <button onClick={() => handleGoogleLogin('seller')} className="btn btn-outline btn-block">
+                Continue as Seller
+              </button>
+              <button onClick={() => handleGoogleLogin('government')} className="btn btn-outline btn-block">
+                Continue as Government Employee
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -19,6 +19,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
 import TrackOrder from './pages/TrackOrder';
+import GovtDashboard from './pages/GovtDashboard';
 
 import './App.css';
 
@@ -59,6 +60,9 @@ function App() {
               <Route path="/seller/products/edit/:id" element={<SellerProductForm />} />
               <Route path="/seller/orders" element={<SellerOrders />} />
               <Route path="/seller/offers" element={<SellerOffers />} />
+              
+              {/* Government Routes */}
+              <Route path="/govt/dashboard" element={<GovtDashboard />} />
               
               {/* Admin Routes Removed */}
               

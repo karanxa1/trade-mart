@@ -271,7 +271,8 @@ async def delete_product(product_id: str):
 
 @router.get("/seller/{seller_id}")
 async def get_seller_products(seller_id: str):
-    products = ProductModel.get_by_seller(seller_id)
+    # Use the new method that gets all products regardless of approval status
+    products = ProductModel.get_all_products_with_approval_status(seller_id=seller_id)
     
     # Get all categories and conditions at once (cached)
     categories = CategoryModel.get_all()

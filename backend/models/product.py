@@ -121,7 +121,8 @@ class ProductModel:
     def get_available_products(cls, limit=None, category_id=None, condition_id=None, 
                                seller_id=None, min_price=None, max_price=None,
                                search_query=None, sort_by='newest'):
-        query = cls.get_collection().where('status', '==', 'available')
+        # Only show approved products to public
+        query = cls.get_collection().where('status', '==', 'available').where('approval_status', '==', 'approved')
         
         if category_id:
             query = query.where('category_id', '==', str(category_id))
@@ -178,6 +179,10 @@ class ProductModel:
             'category_id': str(category_id),
             'seller_id': str(seller_id),
             'status': 'available',
+            'approval_status': 'pending',
+            'approved_by': None,
+            'approved_at': None,
+            'rejection_reason': None,
             'created_at': firestore.SERVER_TIMESTAMP
         }
         doc_ref = cls.get_collection().document()
@@ -191,3 +196,49 @@ class ProductModel:
     @classmethod
     def delete(cls, doc_id):
         cls.get_collection().document(str(doc_id)).delete()
+    
+    @classmethod
+    def get_pending_products(cls):
+        """Get all products pending approval"""
+        docs = cls.get_collection().where('approval_status', '==', 'pending').stream()
+        return [{'id': doc.id, **doc.to_dict()} for doc in docs]
+    
+    @classmethod
+    def get_all_products_with_approval_status(cls, seller_id=None):
+        """Get all products regardless of approval status (for seller/admin view)"""
+        if seller_id:
+            docs = cls.get_collection().where('seller_id', '==', str(seller_id)).stream()
+        else:
+            docs = cls.get_collection().stream()
+        return [{'id': doc.id, **doc.to_dict()} for doc in docs]
+    
+    @classmethod
+    def approve_product(cls, product_id, gov_employee_id):
+        """Approve a product"""
+        cls.get_collection().document(str(product_id)).update({
+            'approval_status': 'approved',
+            'approved_by': str(gov_employee_id),
+            'approved_at': firestore.SERVER_TIMESTAMP,
+            'rejection_reason': None
+        })
+    
+    @classmethod
+    def reject_product(cls, product_id: str, gov_employee_id: str, reason: str):
+        """Reject a product"""
+        cls.get_collection().document(str(product_id)).update({
+            'approval_status': 'rejected',
+            'approved_by': str(gov_employee_id),
+            'approved_at': firestore.SERVER_TIMESTAMP,
+            'rejection_reason': reason
+        })
+    
+    @classmethod
+    def delete_by_government(cls, product_id: str, gov_employee_id: str, reason: str):
+        """Delete a product by government employee"""
+        cls.get_collection().document(str(product_id)).update({
+            'status': 'deleted',
+            'deleted_by_govt': True,
+            'deleted_by': str(gov_employee_id),
+            'deleted_at': firestore.SERVER_TIMESTAMP,
+            'deletion_reason': reason
+        })

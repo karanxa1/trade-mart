@@ -83,6 +83,39 @@ const SellerProducts = () => {
                     <span>{product.category_name}</span>
                     <span>{product.condition_name}</span>
                   </div>
+                  {/* Approval Status */}
+                  <div className="approval-status">
+                    {product.deleted_by_govt && (
+                      <div className="status-tag govt-deleted">
+                        <i className="fas fa-ban"></i> Removed by Government
+                        {product.deletion_reason && (
+                          <span className="deletion-reason">
+                            Reason: {product.deletion_reason}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {!product.deleted_by_govt && product.approval_status === 'pending' && (
+                      <div className="status-tag pending">
+                        <i className="fas fa-clock"></i> Pending Approval
+                      </div>
+                    )}
+                    {!product.deleted_by_govt && product.approval_status === 'approved' && (
+                      <div className="status-tag approved">
+                        <i className="fas fa-check-circle"></i> Approved
+                      </div>
+                    )}
+                    {!product.deleted_by_govt && product.approval_status === 'rejected' && (
+                      <div className="status-tag rejected">
+                        <i className="fas fa-times-circle"></i> Rejected
+                        {product.rejection_reason && (
+                          <span className="rejection-reason">
+                            Reason: {product.rejection_reason}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="product-actions">
                   <Link to={`/seller/products/edit/${product.id}`} className="btn-icon edit">

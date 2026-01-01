@@ -79,8 +79,17 @@ export const offersAPI = {
   createOffer: (productId, buyerId, offerPrice) => 
     api.post('/offers', { product_id: productId, buyer_id: buyerId, offer_price: offerPrice }),
   respondToOffer: (offerId, action) => api.post(`/offers/${offerId}/respond`, { action }),
-};
+}
 
-// adminAPI removed
+export const adminAPI = {
+  getPendingProducts: () => api.get('/admin/pending-products'),
+  getApprovalStats: () => api.get('/admin/product-approval-stats'),
+  approveProduct: (productId, govEmployeeId) => 
+    api.post(`/admin/product/${productId}/approve`, { gov_employee_id: govEmployeeId }),
+  rejectProduct: (productId, govEmployeeId, reason) => 
+    api.post(`/admin/product/${productId}/reject`, { gov_employee_id: govEmployeeId, reason }),
+  deleteProduct: (productId, govEmployeeId, reason) =>
+    api.post(`/admin/product/${productId}/delete`, { gov_employee_id: govEmployeeId, reason }),
+};
 
 export default api;

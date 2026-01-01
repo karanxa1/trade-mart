@@ -11,7 +11,8 @@ from .routes import (
     cart_router,
     orders_router,
     messages_router,
-    offers_router
+    offers_router,
+    admin_router
 )
 from .models import init_firestore_data
 
@@ -67,6 +68,7 @@ app.include_router(cart_router)
 app.include_router(orders_router)
 app.include_router(messages_router)
 app.include_router(offers_router)
+app.include_router(admin_router)
 
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'public', 'images', 'products')
 if os.path.exists(UPLOAD_DIR):

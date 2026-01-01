@@ -107,6 +107,7 @@ const Register = () => {
             >
               <option value="buyer">Buy Items (Buyer)</option>
               <option value="seller">Sell Items (Seller)</option>
+              <option value="government">Government Employee</option>
             </select>
           </div>
 
@@ -211,6 +212,9 @@ const Register = () => {
               </button>
               <button onClick={() => handleGoogleLogin('seller')} className="btn btn-outline btn-block">
                 Continue as Seller
+              </button>
+              <button onClick={() => handleGoogleLogin('government')} className="btn btn-outline btn-block">
+                Continue as Government Employee
               </button>
             </div>
           </div>

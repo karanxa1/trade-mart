@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     isBuyer: user?.user_type === 'buyer',
     isSeller: user?.user_type === 'seller',
-    isGovt: user?.user_type === 'govt_employee',
+    isGovt: user?.user_type === 'government',
   };
 
   return (

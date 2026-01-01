@@ -5,4 +5,4 @@ from .cart import router as cart_router
 from .orders import router as orders_router
 from .messages import router as messages_router
 from .offers import router as offers_router
-# admin_router removed
+from .admin import router as admin_router

@@ -81,10 +81,14 @@ async def login(request: LoginRequest):
 
 @router.post("/register")
 async def register(request: RegisterRequest):
+    logger.info(f"Registration attempt - username: {request.username}, email: {request.email}, user_type: {request.user_type}")
+    
     if UserModel.get_by_username(request.username):
+        logger.warning(f"Registration failed: Username {request.username} already exists")
         raise HTTPException(status_code=400, detail="Username already exists")
     
     if UserModel.get_by_email(request.email):
+        logger.warning(f"Registration failed: Email {request.email} already exists")
         raise HTTPException(status_code=400, detail="Email already exists")
     
     try:
@@ -95,7 +99,9 @@ async def register(request: RegisterRequest):
                 display_name=request.username
             )
             uid = firebase_user.uid
-        except Exception:
+            logger.info(f"Firebase user created: {uid}")
+        except Exception as firebase_error:
+            logger.warning(f"Firebase user creation failed: {str(firebase_error)}. Using UUID instead.")
             uid = str(uuid.uuid4())
         
         password_hash = UserModel.hash_password(request.password)
@@ -108,6 +114,8 @@ async def register(request: RegisterRequest):
             user_type=request.user_type,
             password_hash=password_hash
         )
+        
+        logger.info(f"User created successfully: {request.username} ({uid})")
         
         token = create_access_token({
             "sub": uid,
@@ -128,7 +136,10 @@ async def register(request: RegisterRequest):
                 "verification_code": user.get('verification_code')
             }
         }
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"Registration error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/google-login")

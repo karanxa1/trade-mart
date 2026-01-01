@@ -112,3 +112,71 @@
 .btn-icon.edit:hover { color: #4f46e5; }
 .btn-icon.delete:hover { color: #dc2626; background: #fee2e2; }
 .btn-icon.view:hover { color: #059669; }
+
+/* Approval Status Styles */
+.approval-status {
+  margin-top: 1rem;
+}
+
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex-wrap: wrap;
+}
+
+.status-tag i {
+  font-size: 1rem;
+}
+
+.status-tag.pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.status-tag.approved {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.status-tag.rejected {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.status-tag.govt-deleted {
+  background: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.rejection-reason {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #666;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(239, 68, 68, 0.05);
+  border-radius: 4px;
+  width: 100%;
+  line-height: 1.4;
+}
+
+.deletion-reason {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #666;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(249, 115, 22, 0.05);
+  border-radius: 4px;
+  width: 100%;
+  line-height: 1.4;
+}

@@ -99,3 +99,9 @@ class UserModel:
     @staticmethod
     def verify_password(password, password_hash):
         return hashlib.sha256(password.encode()).hexdigest() == password_hash
+    
+    @classmethod
+    def get_government_employees(cls):
+        """Get all government employees"""
+        docs = cls.get_collection().where('user_type', '==', 'government').stream()
+        return [{'id': doc.id, **doc.to_dict()} for doc in docs]

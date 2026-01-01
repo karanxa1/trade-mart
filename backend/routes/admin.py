@@ -5,7 +5,7 @@ from typing import Optional
 
 from ..models.user import UserModel
 from ..models.verification import BusinessVerificationModel, ReviewModel
-from ..models.product import ProductModel
+from ..models.product import ProductModel, CategoryModel, ConditionModel
 from ..models.order import OrderItemModel
 from ..config import db
 
@@ -16,6 +16,17 @@ class VerificationResponse(BaseModel):
     reason: Optional[str] = None
 
 class SuspendSellerRequest(BaseModel):
+    reason: str
+
+class ProductApprovalRequest(BaseModel):
+    gov_employee_id: str
+
+class ProductRejectionRequest(BaseModel):
+    gov_employee_id: str
+    reason: str
+
+class ProductDeletionRequest(BaseModel):
+    gov_employee_id: str
     reason: str
 
 @router.get("/pending-verifications")
@@ -185,3 +196,89 @@ async def verify_seller(seller_id: str):
     UserModel.update(seller_id, {'is_verified': True, 'identity_verified': True})
     
     return {"success": True, "message": "Seller verified"}
+
+# Product Approval Routes
+@router.get("/pending-products")
+async def get_pending_products():
+    """Get all active products for government review (pending + approved)"""
+    products = ProductModel.get_all_products_with_approval_status()
+    
+    # Filter out deleted products  
+    products = [p for p in products if p.get('status') != 'deleted']
+    
+    # Enrich with seller and category info
+    seller_ids = list(set([p.get('seller_id') for p in products if p.get('seller_id')]))
+    sellers = UserModel.get_by_ids(seller_ids)
+    sellers_map = {s['id']: s for s in sellers}
+    
+    categories = CategoryModel.get_all()
+    conditions = ConditionModel.get_all()
+    cat_map = {c['id']: c for c in categories}
+    cond_map = {c['id']: c for c in conditions}
+    
+    for product in products:
+        seller = sellers_map.get(product.get('seller_id'))
+        category = cat_map.get(product.get('category_id'))
+        condition = cond_map.get(product.get('condition_id'))
+        
+        product['seller'] = {
+            'id': seller['id'] if seller else None,
+            'username': seller.get('username') if seller else 'Unknown',
+            'email': seller.get('email') if seller else 'Unknown'
+        } if seller else None
+        product['category_name'] = category.get('name') if category else ''
+        product['condition_name'] = condition.get('name') if condition else ''
+    
+    return products
+
+@router.post("/product/{product_id}/approve")
+async def approve_product(product_id: str, request: ProductApprovalRequest):
+    """Approve a pending product"""
+    product = ProductModel.get_by_id(product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    if product.get('approval_status') == 'approved':
+        raise HTTPException(status_code=400, detail="Product already approved")
+    
+    ProductModel.approve_product(product_id, request.gov_employee_id)
+    return {"success": True, "message": "Product approved successfully"}
+
+@router.post("/product/{product_id}/reject")
+async def reject_product(product_id: str, request: ProductRejectionRequest):
+    """Reject a pending product"""
+    product = ProductModel.get_by_id(product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    if product.get('approval_status') == 'approved':
+        raise HTTPException(status_code=400, detail="Product already approved")
+    
+    ProductModel.reject_product(product_id, request.gov_employee_id, request.reason)
+    return {"success": True, "message": "Product rejected"}
+
+@router.post("/product/{product_id}/delete")
+async def delete_product(product_id: str, request: ProductDeletionRequest):
+    """Delete a product by government employee"""
+    product = ProductModel.get_by_id(product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    ProductModel.delete_by_government(product_id, request.gov_employee_id, request.reason)
+    return {"success": True, "message": "Product deleted successfully"}
+
+@router.get("/product-approval-stats")
+async def get_product_approval_stats():
+    """Get statistics about product approvals"""
+    all_products = ProductModel.get_all_products_with_approval_status()
+    
+    pending_count = sum(1 for p in all_products if p.get('approval_status') == 'pending')
+    approved_count = sum(1 for p in all_products if p.get('approval_status') == 'approved')
+    rejected_count = sum(1 for p in all_products if p.get('approval_status') == 'rejected')
+    
+    return {
+        "pending": pending_count,
+        "approved": approved_count,
+        "rejected": rejected_count,
+        "total": len(all_products)
+    }

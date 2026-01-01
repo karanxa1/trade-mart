@@ -94,6 +94,11 @@ const Navbar = () => {
                   </Link>
                 </li>
               </>
+            ) : isGovt ? (
+              <>
+                <li><Link to="/govt/dashboard">Approval Dashboard</Link></li>
+                <li><Link to="/products">Browse Products</Link></li>
+              </>
             ) : (
               <>
                 <li><Link to="/">Home</Link></li>
@@ -129,6 +134,11 @@ const Navbar = () => {
                       <>
                         <Link to="/seller/dashboard" onClick={handleLinkClick}>Seller Dashboard</Link>
                         <Link to="/seller/products" onClick={handleLinkClick}>My Products</Link>
+                      </>
+                    )}
+                    {isGovt && (
+                      <>
+                        <Link to="/govt/dashboard" onClick={handleLinkClick}>Approval Dashboard</Link>
                       </>
                     )}
                     <hr />
